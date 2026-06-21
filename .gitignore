@@ -1,0 +1,7 @@
+coverage/*
+system-index.txt
+.DS_Store/
+.qlot/
+.quicklisp
+.sbclrc
+*-service
