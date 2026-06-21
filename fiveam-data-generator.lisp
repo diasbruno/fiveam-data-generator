@@ -30,7 +30,7 @@
 
 ;;;; Numeric generators
 
-(defmethod gen ((type (eql 'integer))
+(defmethod gen ((type (eql :integer))
                 &rest args
                 &key
                   (min most-negative-fixnum)
@@ -42,7 +42,7 @@
      (+ min
         (random (1+ (- max min)))))))
 
-(defmethod gen ((type (eql 'float))
+(defmethod gen ((type (eql :float))
                 &rest args
                 &key
                   (min 0.0)
@@ -55,7 +55,7 @@
         (* (random 1.0)
            (- max min))))))
 
-(defmethod gen ((type (eql 'double-float))
+(defmethod gen ((type (eql :double-float))
                 &rest args
                 &key
                   (min 0d0)
@@ -68,7 +68,7 @@
         (* (random 1d0)
            (- max min))))))
 
-(defmethod gen ((type (eql 'complex))
+(defmethod gen ((type (eql :complex))
                 &rest args
                 &key
                   (part-generator (gen 'float))
@@ -82,7 +82,7 @@
 
 ;;;; Boolean generator
 
-(defmethod gen ((type (eql 'boolean))
+(defmethod gen ((type (eql :boolean))
                 &rest args)
   (declare (ignore args))
   (make-generator
@@ -91,7 +91,7 @@
 
 ;;;; Character generator
 
-(defmethod gen ((type (eql 'character))
+(defmethod gen ((type (eql :character))
                 &rest args)
   (declare (ignore args))
   (make-generator
@@ -101,12 +101,12 @@
 
 ;;;; String generator
 
-(defmethod gen ((type (eql 'string))
+(defmethod gen ((type (eql :string))
                 &rest args
                 &key
                   (min-length 0)
                   (max-length 20)
-                  (character-generator (gen 'character))
+                  (character-generator (gen :character))
                 &allow-other-keys)
   (declare (ignore args))
   (make-generator
@@ -121,7 +121,7 @@
 
 ;;;; Symbol generator
 
-(defmethod gen ((type (eql 'symbol))
+(defmethod gen ((type (eql :symbol))
                 &rest args
                 &key
                   (package *package*)
@@ -133,14 +133,14 @@
      (let ((name
              (string-upcase
               (generate
-               (gen 'string
+               (gen :string
                     :min-length 1
                     :max-length 12)))))
        (if intern
            (intern name package)
            (make-symbol name))))))
 
-(defmethod gen ((type (eql 'keyword))
+(defmethod gen ((type (eql :keyword))
                 &rest args)
   (declare (ignore args))
   (make-generator
@@ -148,13 +148,13 @@
      (intern
       (symbol-name
        (generate
-        (gen 'symbol
+        (gen :symbol
              :intern nil)))
       "KEYWORD"))))
 
 ;;;; Collection generators
 
-(defmethod gen ((type (eql 'list))
+(defmethod gen ((type (eql :list))
                 &rest args
                 &key
                   of
@@ -168,7 +168,7 @@
                      (random (1+ (- max-length min-length))))
            collect (generate of)))))
 
-(defmethod gen ((type (eql 'vector))
+(defmethod gen ((type (eql :vector))
                 &rest args
                 &key
                   of
@@ -180,13 +180,13 @@
    (lambda ()
      (coerce
       (generate
-       (gen 'list
+       (gen :list
             :of of
             :min-length min-length
             :max-length max-length))
       'vector))))
 
-(defmethod gen ((type (eql 'array))
+(defmethod gen ((type (eql :array))
                 &rest args
                 &key
                   of

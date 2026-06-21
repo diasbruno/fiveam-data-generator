@@ -12,102 +12,103 @@
 
 (test integer-generator
   (loop repeat 100
-        for value = (generate (gen 'integer
+        for value = (generate (gen :integer
                                    :min 1
                                    :max 10))
         do
-        (is (integerp value))
-        (is (<= 1 value 10))))
+           (is (integerp value))
+           (is (<= 1 value 10))))
 
 (test float-generator
   (loop repeat 100
-        for value = (generate (gen 'float
+        for value = (generate (gen :float
                                    :min 0.0
                                    :max 1.0))
         do
-        (is (floatp value))
-        (is (<= 0.0 value 1.0))))
+           (is (floatp value))
+           (is (<= 0.0 value 1.0))))
 
 (test double-float-generator
   (loop repeat 100
-        for value = (generate (gen 'double-float
+        for value = (generate (gen :double-float
                                    :min 0d0
                                    :max 1d0))
         do
-        (is (typep value 'double-float))
-        (is (<= 0d0 value 1d0))))
+           (is (typep value 'double-float))
+           (is (<= 0d0 value 1d0))))
 
 (test complex-generator
   (loop repeat 100
-        for value = (generate (gen 'complex))
+        for value = (generate (gen :complex))
         do
-        (is (complexp value))))
+           (is (complexp value))))
 
 (test boolean-generator
   (loop repeat 100
-        for value = (generate (gen 'boolean))
+        for value = (generate (gen :boolean))
         do
-        (is (typep value 'boolean))))
+           (is (typep value 'boolean))))
 
 (test character-generator
   (loop repeat 100
-        for value = (generate (gen 'character))
+        for value = (generate (gen :character))
         do
-        (is (characterp value))))
+           (is (characterp value))))
 
 (test string-generator
   (loop repeat 100
-        for value = (generate (gen 'string
+        for value = (generate (gen :string
                                    :min-length 5
                                    :max-length 10))
         do
-        (is (stringp value))
-        (is (<= 5 (length value) 10))))
+           (is (stringp value))
+           (is (<= 5 (length value) 10))))
 
 (test symbol-generator
   (loop repeat 100
-        for value = (generate (gen 'symbol))
+        for value = (generate (gen :symbol))
         do
-        (is (symbolp value))))
+           (is (symbolp value))))
 
 (test keyword-generator
   (loop repeat 100
-        for value = (generate (gen 'keyword))
+        for value = (generate (gen :keyword))
         do
-        (is (keywordp value))))
+           (is (keywordp value))))
 
 (test list-generator
   (loop repeat 100
-        for value = (generate (gen 'list
-                                   :of (gen 'integer)
+        for value = (generate (gen :list
+                                   :of (gen :integer)
                                    :min-length 5
                                    :max-length 10))
         do
-        (is (listp value))
-        (is (<= 5 (length value) 10))
-        (is (every #'integerp value))))
+           (is (listp value))
+           (is (<= 5 (length value) 10))
+           (is (every #'integerp value))))
 
 (test vector-generator
   (loop repeat 100
-        for value = (generate (gen 'vector
-                                   :of (gen 'string)
+        for value = (generate (gen :vector
+                                   :of (gen :string)
                                    :min-length 5
                                    :max-length 10))
         do
-        (is (vectorp value))
-        (is (<= 5 (length value) 10))
-        (is (every #'stringp value))))
+           (is (vectorp value))
+           (is (<= 5 (length value) 10))
+           (is (every #'stringp value))))
 
 (test array-generator
   (loop repeat 100
-        for value = (generate (gen 'array
-                                   :of (gen 'integer)
+        for value = (generate (gen :array
+                                   :of (gen :integer)
                                    :dimensions '(3 3)))
         do
-        (is (arrayp value))
-        (is (equal '(3 3)
-                   (array-dimensions value)))
-        (is (loop for i below (array-total-size value)
-                  always
-                  (integerp
-                   (row-major-aref value i))))))
+           (is (arrayp value))
+           (is (equal '(3 3)
+                      (array-dimensions value)))
+           (is (loop for i below (array-total-size value)
+                     always
+                     (integerp
+                      (row-major-aref value i))))))
+
