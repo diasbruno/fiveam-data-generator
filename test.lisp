@@ -112,3 +112,99 @@
                      (integerp
                       (row-major-aref value i))))))
 
+(test constant-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :constant
+                          :value 42))
+        do
+           (is (= 42 value))))
+
+(test member-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :member
+                          :members '(red green blue)))
+        do
+           (is (member value '(red green blue)))))
+
+(test one-of-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :one-of
+                          :generators
+                          (list (gen :integer)
+                                (gen :string)
+                                (gen :boolean))))
+        do
+           (is (or (integerp value)
+                   (stringp value)
+                   (typep value 'boolean)))))
+
+(test map-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :map
+                          :generator
+                          (gen :integer
+                               :min 1
+                               :max 10)
+                          :function
+                          (lambda (n)
+                            (* n n))))
+        do
+           (is (integerp value))
+           (is (member value
+                       '(1 4 9 16 25 36 49 64 81 100)))))
+
+(test filter-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :filter
+                          :generator (gen :integer)
+                          :predicate #'evenp))
+        do
+           (is (integerp value))
+           (is (evenp value))))
+
+(test optional-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :optional
+                          :generator (gen :integer)))
+        do
+           (is (or (null value)
+                   (integerp value)))))
+
+(test tuple-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :tuple
+                          :generators
+                          (list (gen :string)
+                                (gen :integer)
+                                (gen :boolean))))
+        do
+           (is (= 3 (length value)))
+           (is (stringp (first value)))
+           (is (integerp (second value)))
+           (is (typep (third value) 'boolean))))
+
+(test bind-generator
+  (loop repeat 100
+        for value = (generate
+                     (gen :bind
+                          :generator
+                          (gen :integer
+                               :min 1
+                               :max 10)
+                          :function
+                          (lambda (n)
+                            (gen :list
+                                 :of (gen :integer)
+                                 :min-length n
+                                 :max-length n))))
+        do
+           (is (listp value))
+           (is (every #'integerp value))
+           (is (<= 1 (length value) 10))))

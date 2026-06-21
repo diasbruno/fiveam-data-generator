@@ -200,3 +200,90 @@
          (setf (row-major-aref array i)
                (generate of)))))))
 
+;;;; Generator combinators
+
+(defmethod gen ((type (eql :constant))
+                &rest args
+                &key value
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     value)))
+
+(defmethod gen ((type (eql :member))
+                &rest args
+                &key members
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (nth (random (length members))
+          members))))
+
+(defmethod gen ((type (eql :one-of))
+                &rest args
+                &key generators
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (generate
+      (nth (random (length generators))
+           generators)))))
+
+(defmethod gen ((type (eql :map))
+                &rest args
+                &key generator function
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (funcall function
+              (generate generator)))))
+
+(defmethod gen ((type (eql :filter))
+                &rest args
+                &key generator predicate
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (loop
+       for value = (generate generator)
+       when (funcall predicate value)
+         return value))))
+
+(defmethod gen ((type (eql :optional))
+                &rest args
+                &key
+                  generator
+                  (probability 0.5)
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (if (< (random 1.0)
+            probability)
+         (generate generator)
+         nil))))
+
+(defmethod gen ((type (eql :tuple))
+                &rest args
+                &key generators
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (mapcar #'generate generators))))
+
+(defmethod gen ((type (eql :bind))
+                &rest args
+                &key generator function
+                &allow-other-keys)
+  (declare (ignore args))
+  (make-generator
+   (lambda ()
+     (generate
+      (funcall function
+               (generate generator))))))
