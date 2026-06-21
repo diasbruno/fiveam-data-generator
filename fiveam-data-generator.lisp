@@ -71,7 +71,7 @@
 (defmethod gen ((type (eql :complex))
                 &rest args
                 &key
-                  (part-generator (gen 'float))
+                  (part-generator (gen :float))
                 &allow-other-keys)
   (declare (ignore args))
   (make-generator
