@@ -91,13 +91,42 @@
 
 ;;;; Character generator
 
+(defparameter +utf-8-ranges+
+  '((#x0020 . #x007E)     ; Basic Latin
+    (#x00A0 . #x00FF)     ; Latin-1 Supplement
+    (#x0100 . #x017F)     ; Latin Extended-A
+    (#x0370 . #x03FF)     ; Greek
+    (#x0400 . #x04FF)     ; Cyrillic
+    (#x3040 . #x309F)     ; Hiragana
+    (#x30A0 . #x30FF)     ; Katakana
+    (#xAC00 . #xD7AF)     ; Hangul
+    (#x1F600 . #x1F64F))) ; Emoji
+
 (defmethod gen ((type (eql :character))
-                &rest args)
+                &rest args
+                &key
+                  (encoding :utf-8)
+                &allow-other-keys)
   (declare (ignore args))
-  (make-generator
-   (lambda ()
-     (code-char
-      (random char-code-limit)))))
+  (ecase encoding
+    (:ascii
+     (make-generator
+      (lambda ()
+        (code-char
+         (+ #x20
+            (random (1+ (- #x7E #x20))))))))
+
+    (:utf-8
+     (make-generator
+      (lambda ()
+        (loop
+          for (start . end) = (nth (random (length +utf-8-ranges+))
+                                   +utf-8-ranges+)
+          for code-point = (+ start
+                              (random (1+ (- end start))))
+          for character = (code-char code-point)
+          when character
+            return character))))))
 
 ;;;; String generator
 
@@ -106,7 +135,8 @@
                 &key
                   (min-length 0)
                   (max-length 20)
-                  (character-generator (gen :character))
+                  (encoding :utf-8)
+                  (character-generator (gen :character :encoding encoding))
                 &allow-other-keys)
   (declare (ignore args))
   (make-generator
